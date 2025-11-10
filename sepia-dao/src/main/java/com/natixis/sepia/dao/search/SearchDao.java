@@ -150,7 +150,7 @@ public abstract class SearchDao<E, C extends GenericCriteria<F>, F extends IFetc
         // ========== QUERY ==========
         String jpql = "select count(distinct " + getCountSelectStatement() + ") "
                 + FROM + getEntityName() + " " + getAliasName() + " "
-                + join(context)
+                + joinWithoutFetch(context)
                 + where(context);
 
         // ========== EXECUTING ==========
@@ -371,24 +371,19 @@ public abstract class SearchDao<E, C extends GenericCriteria<F>, F extends IFetc
 
     // ========= JPQL Generator methods ==========
 
+    private String joinWithoutFetch(SearchContext<C, F> context) {
+        return context.getJoins().stream()
+                .map(Join::getJoinClauseWithoutFetch)
+                .collect(Collectors.joining());
+    }
+
     /**
      * Generates the join clause of the jpql query
      */
     private String join(SearchContext<C, F> context) {
-        StringBuilder jpql = new StringBuilder();
-        for (String alias : context.getJoinsAlias()) {
-            String path = context.getJoins().get(alias);
-            jpql.append("join ").append(path).append(" ").append(alias).append(" ");
-        }
-        for (String alias : context.getLeftJoinsAlias()) {
-            String path = context.getLeftJoins().get(alias);
-            jpql.append("left join ").append(path).append(" ").append(alias).append(" ");
-        }
-        for (String alias : context.getJoinsToFetchAlias()) {
-            String path = context.getJoinsToFetch().get(alias);
-            jpql.append("left join fetch ").append(path).append(" ").append(alias).append(" ");
-        }
-        return jpql.toString();
+        return context.getJoins().stream()
+                .map(Join::getJoinClause)
+                .collect(Collectors.joining());
     }
 
     /**

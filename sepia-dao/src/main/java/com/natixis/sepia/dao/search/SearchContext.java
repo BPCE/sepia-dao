@@ -4,63 +4,36 @@ import com.natixis.sepia.dao.search.criteria.GenericCriteria;
 import com.natixis.sepia.dao.search.criteria.IFetching;
 import com.natixis.sepia.dao.search.domain.StringSearch;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.criteria.JoinType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.Normalizer;
 import java.util.*;
 
+import static jakarta.persistence.criteria.JoinType.INNER;
+import static jakarta.persistence.criteria.JoinType.LEFT;
+
 public class SearchContext<C extends GenericCriteria<F>, F extends IFetching> {
 
     // ========== ATTRIBUTES ==========
-
     private C criteria;
 
-    /**
-     * Joins to include in the query if there is some filtering on sublists
-     */
-    private Map<String, String> joins;
-    /**
-     * This list is made to fix the order of the joins, regarding "join dependencies"
-     */
-    private Set<String> joinsAlias;
-
-    /**
-     * Left joins to include in the query if there is some filtering on sublists
-     */
-    private Map<String, String> leftJoins;
-    /**
-     * This list is made to fix the order of the joins, regarding "join dependencies"
-     */
-    private Set<String> leftJoinsAlias;
-
-    /**
-     * Joins fetch to include in the query (when EntityGraph are not possible; ex: graphs don't work on @Embedded fields)
-     */
-    private Map<String, String> joinsToFetch;
-    /**
-     * This list is made to fix the order of the joins, regarding "join dependencies"
-     */
-    private Set<String> joinsToFetchAlias;
+    private final List<Join> joins;
 
     /**
      * Conditions to put in the where clause of the query
      */
-    private List<String> conditions;
+    private final List<String> conditions;
 
     /**
      * Parameters to set into the query
      */
-    private Map<String, QueryParameter> params;
+    private final Map<String, QueryParameter> params;
 
     // ========== CONSTRUCTOR ==========
 
     public SearchContext() {
-        this.joins = new HashMap<>();
-        this.joinsAlias = new HashSet<>();
-        this.leftJoins = new HashMap<>();
-        this.leftJoinsAlias = new HashSet<>();
-        this.joinsToFetch = new HashMap<>();
-        this.joinsToFetchAlias = new HashSet<>();
+        this.joins = new ArrayList<>();
         this.params = new HashMap<>();
         this.conditions = new ArrayList<>();
     }
@@ -75,34 +48,62 @@ public class SearchContext<C extends GenericCriteria<F>, F extends IFetching> {
     /**
      * Adds one path to be added on the clause, with its alias
      */
-    public void addJoin(String alias, String path) {
-        this.getJoins().put(alias, path);
-        this.getJoinsAlias().add(alias);
+    public void join(String alias, String path) {
+        Optional<Join> join = getJoin(alias);
+        if (join.isPresent()) {
+            join.get().type(INNER);
+        } else {
+            addJoin(INNER, alias, path);
+        }
     }
 
-    /**
-     * Adds one path to be added as left join on the clause, with its alias
-     */
-    public void addLeftJoin(String alias, String path) {
-        this.getLeftJoins().put(alias, path);
-        this.getLeftJoinsAlias().add(alias);
+    private Optional<Join> getJoin(String alias) {
+        return joins.stream().filter(j -> j.getAlias().equals(alias)).findFirst();
     }
 
-    /**
-     * Adds one path to be fetched on the clause, with its alias
-     */
-    public void addJoinFetch(String alias, String path) {
-        this.getJoinsToFetch().put(alias, path);
-        this.getJoinsToFetchAlias().add(alias);
+    private void addJoin(JoinType type, String alias, String path) {
+        addJoin(type, alias, path, false);
+    }
+
+    private void addJoin(JoinType type, String alias, String path, boolean mustFetch) {
+        joins.add(new Join()
+                .type(type)
+                .alias(alias)
+                .path(path)
+                .mustFetch(mustFetch)
+        );
+    }
+
+    public void joinFetch(String alias, String path) {
+        Optional<Join> join = getJoin(alias);
+        if (join.isPresent()) {
+            join.get()
+                    .type(INNER)
+                    .mustFetch(true);
+        } else {
+            addJoin(INNER, alias, path, true);
+        }
+    }
+
+    public void leftJoin(String alias, String path) {
+        Optional<Join> join = getJoin(alias);
+        if (join.isEmpty()) {
+            addJoin(LEFT, alias, path);
+        }
+    }
+
+    public void leftJoinFetch(String alias, String path) {
+        Optional<Join> join = getJoin(alias);
+        if (join.isPresent()) {
+            join.get()
+                    .mustFetch(true);
+        } else {
+            addJoin(LEFT, alias, path, true);
+        }
     }
 
     protected void clearJoins() {
-        this.getJoinsToFetch().clear();
-        this.getJoinsToFetchAlias().clear();
         this.getJoins().clear();
-        this.getJoinsAlias().clear();
-        this.getLeftJoins().clear();
-        this.getLeftJoinsAlias().clear();
     }
 
     // ========== METHODS for Conditions ==========
@@ -231,27 +232,7 @@ public class SearchContext<C extends GenericCriteria<F>, F extends IFetching> {
         return params;
     }
 
-    protected Map<String, String> getJoins() {
+    protected List<Join> getJoins() {
         return joins;
-    }
-
-    protected Map<String, String> getJoinsToFetch() {
-        return joinsToFetch;
-    }
-
-    protected Set<String> getJoinsToFetchAlias() {
-        return joinsToFetchAlias;
-    }
-
-    protected Map<String, String> getLeftJoins() {
-        return leftJoins;
-    }
-
-    protected Set<String> getJoinsAlias() {
-        return joinsAlias;
-    }
-
-    protected Set<String> getLeftJoinsAlias() {
-        return leftJoinsAlias;
     }
 }
