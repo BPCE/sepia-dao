@@ -9,13 +9,11 @@ import fr.groupebpce.sepia.dao.showcase.dao.country.CountryCriteria;
 import fr.groupebpce.sepia.dao.showcase.dao.country.CountryDao;
 import fr.groupebpce.sepia.dao.showcase.entity.Club;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
