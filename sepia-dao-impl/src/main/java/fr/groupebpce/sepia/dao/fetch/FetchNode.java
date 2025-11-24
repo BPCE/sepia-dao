@@ -41,6 +41,10 @@ public class FetchNode {
         isCollection = collection;
         return this;
     }
+    
+    public boolean isNotCollection() {
+        return !isCollection;
+    }
 
     @Override
     public boolean equals(Object o) {

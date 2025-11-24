@@ -36,8 +36,3 @@ You also have :
 - `notExist()` : returns the opposite of `exists()` (for readability purpose, avoids usage of `!`)
 - `searchOne()` : returns the (supposedly) only single row matching the criteria (if exists) as an `Optional` (instead of a `List` if invoking `search()`)
 The QueryDao is able to provide all these services since the global query is predictable in each case, and the only thing
-
-
-
-
-* test th

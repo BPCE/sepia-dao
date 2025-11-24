@@ -8,8 +8,7 @@ import fr.groupebpce.sepia.dao.domain.GraphType;
 import fr.groupebpce.sepia.dao.domain.Join;
 import fr.groupebpce.sepia.dao.domain.Operator;
 import fr.groupebpce.sepia.dao.domain.QueryParameter;
-import fr.groupebpce.sepia.dao.fetch.EntityGraphBuilder;
-import fr.groupebpce.sepia.dao.fetch.EntityGraphList;
+import fr.groupebpce.sepia.dao.fetch.EntityGraphGenerator;
 import fr.groupebpce.sepia.exception.EntityNotFoundException;
 import jakarta.persistence.*;
 
@@ -47,7 +46,6 @@ public abstract class QueryDao<E, C extends GenericCriteria> {
     /**
      * Default values for pagination
      */
-    private static final int DEFAULT_PAGE_SIZE = 20;
     private static final int DEFAULT_MAX_PAGE_SIZE = 100;
 
     @PersistenceContext
@@ -78,13 +76,10 @@ public abstract class QueryDao<E, C extends GenericCriteria> {
         filter(context);
 
         // ========== FETCHING ==========
-        EntityGraphBuilder<E> builder = new EntityGraphBuilder<>(entityManager, entityClass);
-        EntityGraphList<E> graphs = builder.build(criteria.getFetching());
-        EntityGraph<E> graph = graphs.getMainEntityGraph();
-        
+        EntityGraphGenerator<E> graphGenerator = new EntityGraphGenerator<>(entityManager, entityClass);
+        graphGenerator.generate(criteria.getFetching());
 
         // ========== QUERY ==========
-
         String jpql = new StringJoiner(" ")
                 .add(select())
                 .add(from())
@@ -93,7 +88,7 @@ public abstract class QueryDao<E, C extends GenericCriteria> {
                 .add(orderBy(criteria))
                 .toString();
 
-        TypedQuery<E> query = generateQuery(criteria, jpql, graph);
+        TypedQuery<E> query = generateQuery(criteria, jpql, graphGenerator.getMainEntityGraph());
         applyQueryParameters(query, context.getParams());
 
         // ========== PAGING ==========
@@ -103,7 +98,7 @@ public abstract class QueryDao<E, C extends GenericCriteria> {
         List<E> resultList = query.getResultList();
         if (nonNull(criteria.getFetching()) && isNotEmpty(resultList)) {
             context.clearJoins();
-            fetchSublists(resultList, graphs.getCollectionEntityGraphs());
+            fetchSublists(resultList, graphGenerator.getCollectionEntityGraphs());
         }
 
         return resultList;
@@ -189,17 +184,17 @@ public abstract class QueryDao<E, C extends GenericCriteria> {
 
     public E find(Serializable id, Fetching fetching) {
 
-        EntityGraphBuilder<E> builder = new EntityGraphBuilder<>(entityManager, entityClass);
-        EntityGraphList<E> graphs = builder.build(fetching);
-        Map<String, Object> props = Map.of(getGraphType().getCode(), graphs.getMainEntityGraph());
+        EntityGraphGenerator<E> graphGenerator = new EntityGraphGenerator<>(entityManager, entityClass);
+        graphGenerator.generate(fetching);
+        Map<String, Object> props = Map.of(getGraphType().getCode(), graphGenerator.getMainEntityGraph());
 
         E entity = entityManager.find(getEntityClass(), id, props);
         if (isNull(entity)) {
             throw new EntityNotFoundException(id, getEntityName());
         }
         
-        if (isNotEmpty(graphs.getCollectionEntityGraphs())) {
-            fetchSublists(List.of(entity), graphs.getCollectionEntityGraphs());
+        if (isNotEmpty(graphGenerator.getCollectionEntityGraphs())) {
+            fetchSublists(List.of(entity), graphGenerator.getCollectionEntityGraphs());
         }
         return entity;
     }
@@ -208,17 +203,6 @@ public abstract class QueryDao<E, C extends GenericCriteria> {
 
     protected abstract void filter(QueryContext<C> context);
     
-    /**
-     * Fills the EntityGraph that will fetch all mentioned attributes of the entity.
-     * It can also include (maximum) one sublist.
-     * If the child DAO wants to fetch several sublists, then it must implement fetchSublists();
-     *
-     * @param graph    : the graph that will be used by the query to fetch the data
-     * @param fetching : contains data to be fetched
-     */
-    protected void fetch(EntityGraph<E> graph, Fetching fetching) {
-    }
-
     /**
      * This method is invoked by search() after the result list has been loaded from the database.
      * It is used to load several sublists of the entities contained in the result list.
@@ -400,10 +384,6 @@ public abstract class QueryDao<E, C extends GenericCriteria> {
      */
     protected Operator getOperator() {
         return AND;
-    }
-
-    protected int getPageSize() {
-        return DEFAULT_PAGE_SIZE;
     }
 
     protected int getMaxPageSize() {
