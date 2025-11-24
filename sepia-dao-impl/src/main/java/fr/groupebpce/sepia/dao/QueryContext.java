@@ -1,7 +1,6 @@
 package fr.groupebpce.sepia.dao;
 
 import fr.groupebpce.sepia.criteria.GenericCriteria;
-import fr.groupebpce.sepia.criteria.fetching.IFetching;
 import fr.groupebpce.sepia.criteria.filter.StringFilter;
 import fr.groupebpce.sepia.dao.domain.Join;
 import fr.groupebpce.sepia.dao.domain.QueryParameter;

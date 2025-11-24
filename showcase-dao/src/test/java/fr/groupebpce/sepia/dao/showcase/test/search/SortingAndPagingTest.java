@@ -2,22 +2,27 @@ package fr.groupebpce.sepia.dao.showcase.test.search;
 
 import fr.groupebpce.sepia.criteria.paging.Paging;
 import fr.groupebpce.sepia.criteria.sorting.Sorting;
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.ShowcaseApplication;
 import fr.groupebpce.sepia.dao.showcase.dao.club.ClubCriteria;
+import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.dao.country.CountryCriteria;
 import fr.groupebpce.sepia.dao.showcase.dao.country.CountryDao;
 import fr.groupebpce.sepia.dao.showcase.entity.Club;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static fr.groupebpce.sepia.criteria.sorting.SortingDirectionEnum.ASC;
 import static fr.groupebpce.sepia.criteria.sorting.SortingDirectionEnum.DESC;
 import static fr.groupebpce.sepia.dao.showcase.utils.ClubDisplayer.display;
+import static java.util.Comparator.reverseOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
@@ -30,13 +35,16 @@ class SortingAndPagingTest {
     final ClubService clubService;
     final CountryDao countryDao;
     List<Club> allClubsSortedByName;
-    
+
     static final Comparator<Club> clubNameComparator = Comparator.comparing(Club::getName);
+    static final Comparator<Club> clubByStadiumCapacityComparator = Comparator
+            .comparing((Club club) -> club.getStadium().getCapacity(), reverseOrder())
+            .thenComparing(Club::getName);
 
     @BeforeAll
     void loadCache() {
         countryDao.search(new CountryCriteria());
-        allClubsSortedByName = clubService.search(new ClubCriteria());
+        allClubsSortedByName = clubService.search(new ClubCriteria().fetch("stadium"));
         allClubsSortedByName.sort(clubNameComparator);
     }
 
@@ -74,10 +82,13 @@ class SortingAndPagingTest {
     @Test
     void selectTopFiveClubsByStadium() {
         List<Club> clubs = clubService.search(new ClubCriteria()
-                .orderBy(new Sorting("stadium.capacity", DESC))
+                .orderBy(new Sorting("stadium.capacity", DESC), new Sorting("name", ASC))
                 .paging(new Paging().pageNumber(1).pageSize(5))
         );
-        display(clubs);
+        List<Club> clubsByCapacity = new ArrayList<>(allClubsSortedByName);
+        clubsByCapacity.sort(clubByStadiumCapacityComparator);
+        assertThat(clubs).isEqualTo(clubsByCapacity.subList(0, 5));
+        display(clubs);        
     }
 
 

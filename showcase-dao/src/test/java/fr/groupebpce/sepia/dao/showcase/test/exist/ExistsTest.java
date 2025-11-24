@@ -1,9 +1,9 @@
 package fr.groupebpce.sepia.dao.showcase.test.exist;
 
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.ShowcaseApplication;
 import fr.groupebpce.sepia.dao.showcase.cache.ClubCache;
 import fr.groupebpce.sepia.dao.showcase.dao.club.ClubCriteria;
+import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.entity.Club;
 import fr.groupebpce.sepia.dao.showcase.entity.Country;
 import fr.groupebpce.sepia.dao.showcase.entity.Stadium;
@@ -35,8 +35,9 @@ class ExistsTest {
                 .map(Club::getName)
                 .anyMatch(s -> s.toUpperCase().contains("LL"));
 
-        assertThat(dbExists).isTrue();
-        assertThat(dbExists).isEqualTo(inMemExists);
+        assertThat(dbExists)
+                .isTrue()
+                .isEqualTo(inMemExists);
     }
 
     @Test
@@ -48,8 +49,9 @@ class ExistsTest {
                 .map(Stadium::getName)
                 .anyMatch(s -> s.toUpperCase().contains("NA"));
         
-        assertThat(dbExists).isTrue();
-        assertThat(dbExists).isEqualTo(inMemExists);
+        assertThat(dbExists)
+                .isTrue()
+                .isEqualTo(inMemExists);
     }
 
     @Test
@@ -63,8 +65,9 @@ class ExistsTest {
                 .map(Stadium::getCapacity)
                 .noneMatch(c -> 200_000 < c);
         
-        assertThat(dbNotExist).isTrue();
-        assertThat(dbNotExist).isEqualTo(inMemNotExist);
+        assertThat(dbNotExist)
+                .isTrue()
+                .isEqualTo(inMemNotExist);
     }
 
     @Test
@@ -78,8 +81,9 @@ class ExistsTest {
                 .map(Country::getCode)
                 .noneMatch("BRA"::equals);
 
-        assertThat(dbNotExist).isTrue();
-        assertThat(dbNotExist).isEqualTo(inMemNotExist);
+        assertThat(dbNotExist)
+                .isTrue()
+                .isEqualTo(inMemNotExist);
     }
 
 }

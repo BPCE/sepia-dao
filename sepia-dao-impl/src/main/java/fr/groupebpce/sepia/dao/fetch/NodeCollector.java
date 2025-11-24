@@ -1,6 +1,7 @@
 package fr.groupebpce.sepia.dao.fetch;
 
 import fr.groupebpce.sepia.criteria.fetching.Fetching;
+import fr.groupebpce.sepia.exception.FetchException;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
@@ -13,7 +14,6 @@ import java.util.*;
 
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Getter
 public class NodeCollector<E> {
@@ -41,15 +41,15 @@ public class NodeCollector<E> {
 
         if (isBlank(path)) throw new IllegalArgumentException("Path to fetch cannot be blank");
 
-        String nodeId = "";
+        StringJoiner nodeId = new StringJoiner(".");
         FetchNode parent = null;
         for (String property : path.split("\\.")) {
-            nodeId += isEmpty(nodeId) ? property : "." + property;
-            nodes.putIfAbsent(nodeId, new FetchNode(nodeId)
+            nodeId.add(property);
+            nodes.putIfAbsent(nodeId.toString(), new FetchNode(nodeId.toString())
                     .property(property)
                     .parent(parent)
             );
-            FetchNode node = nodes.get(nodeId);
+            FetchNode node = nodes.get(nodeId.toString());
             defineClassTypeAndCollection(node);
             if (isNull(node.getParent())) {
                 roots.add(node);
@@ -70,7 +70,7 @@ public class NodeCollector<E> {
         } else if (parentClass.isAnnotationPresent(Embeddable.class)) {
             parentJpaType = em.getMetamodel().embeddable(parentClass);
         } else {
-            throw new RuntimeException("Cannot fetch node %s since it is not an Entity, nor an Embeddable".formatted(node.getId()));
+            throw new FetchException("Cannot fetch node %s since it is not an Entity, nor an Embeddable".formatted(node.getId()));
         }
         defineClassTypeAndCollection(node, parentJpaType);
     }
@@ -94,7 +94,7 @@ public class NodeCollector<E> {
             }
         }
 
-        throw new RuntimeException("Cannot find property %s. Seems it's not managed/mapped in JPA".formatted(node.getId()));
+        throw new FetchException("Cannot find property %s. Seems it's not managed/mapped in JPA".formatted(node.getId()));
     }
     
 }

@@ -1,8 +1,8 @@
 package fr.groupebpce.sepia.dao.showcase.test.exceptions;
 
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.ShowcaseApplication;
 import fr.groupebpce.sepia.dao.showcase.cache.ClubCache;
+import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.entity.Club;
 import fr.groupebpce.sepia.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

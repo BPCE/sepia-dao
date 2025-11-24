@@ -1,9 +1,7 @@
 package fr.groupebpce.sepia.dao.showcase.test.fetch;
 
-import fr.groupebpce.sepia.criteria.fetching.Fetching;
 import fr.groupebpce.sepia.dao.showcase.ShowcaseApplication;
 import fr.groupebpce.sepia.dao.showcase.cache.ClubCache;
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubCriteria;
 import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.dao.country.CountryCriteria;
 import fr.groupebpce.sepia.dao.showcase.dao.country.CountryDao;

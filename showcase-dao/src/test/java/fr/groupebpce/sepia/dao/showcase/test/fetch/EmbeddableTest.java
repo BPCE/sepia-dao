@@ -1,8 +1,7 @@
 package fr.groupebpce.sepia.dao.showcase.test.fetch;
 
-import fr.groupebpce.sepia.criteria.fetching.Fetching;
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.ShowcaseApplication;
+import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.entity.Club;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.MethodOrderer;

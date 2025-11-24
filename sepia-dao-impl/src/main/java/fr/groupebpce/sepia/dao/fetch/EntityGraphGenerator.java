@@ -1,10 +1,13 @@
 package fr.groupebpce.sepia.dao.fetch;
 
 import fr.groupebpce.sepia.criteria.fetching.Fetching;
-import jakarta.persistence.*;
+import jakarta.persistence.EntityGraph;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Subgraph;
 import lombok.Getter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.util.Objects.nonNull;
 

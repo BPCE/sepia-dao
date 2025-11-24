@@ -1,12 +1,11 @@
 package fr.groupebpce.sepia.dao.showcase.dao.club;
 
-import fr.groupebpce.sepia.criteria.fetching.IFetching;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class ClubFetching implements IFetching {
+public class ClubFetching {
 
     // ========== ATTRIBUTES ==========
 

@@ -10,8 +10,6 @@ import fr.groupebpce.sepia.dao.showcase.entity.Country;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 import static java.util.Objects.isNull;
@@ -108,6 +106,7 @@ public class ClubCriteria extends GenericCriteria {
         return this;
     }
 
+    @Override
     public ClubCriteria fetching(Fetching fetching) {
         super.fetching(fetching);
         return this;
@@ -119,6 +118,7 @@ public class ClubCriteria extends GenericCriteria {
         return this;
     }
 
+    @Override
     public ClubCriteria orderBy(Sorting... sortings) {
         super.orderBy(sortings);
         return this;

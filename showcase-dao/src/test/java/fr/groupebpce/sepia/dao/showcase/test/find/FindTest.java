@@ -1,7 +1,7 @@
 package fr.groupebpce.sepia.dao.showcase.test.find;
 
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.ShowcaseApplication;
+import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.dao.country.CountryCriteria;
 import fr.groupebpce.sepia.dao.showcase.dao.country.CountryDao;
 import fr.groupebpce.sepia.dao.showcase.entity.Club;

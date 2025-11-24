@@ -1,9 +1,9 @@
 package fr.groupebpce.sepia.dao.showcase.test.count;
 
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.ShowcaseApplication;
 import fr.groupebpce.sepia.dao.showcase.cache.ClubCache;
 import fr.groupebpce.sepia.dao.showcase.dao.club.ClubCriteria;
+import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.entity.Club;
 import fr.groupebpce.sepia.dao.showcase.entity.Country;
 import fr.groupebpce.sepia.dao.showcase.entity.Stadium;

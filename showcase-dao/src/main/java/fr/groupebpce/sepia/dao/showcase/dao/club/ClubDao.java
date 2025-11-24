@@ -5,18 +5,8 @@ import fr.groupebpce.sepia.dao.QueryContext;
 import fr.groupebpce.sepia.dao.QueryDao;
 import fr.groupebpce.sepia.dao.showcase.entity.Club;
 import jakarta.persistence.EntityGraph;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.metamodel.EntityType;
-import jakarta.persistence.metamodel.ManagedType;
-import jakarta.persistence.metamodel.PluralAttribute;
-import jakarta.persistence.metamodel.SingularAttribute;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
-
-import java.lang.annotation.Annotation;
-import java.util.List;
-import java.util.Set;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
