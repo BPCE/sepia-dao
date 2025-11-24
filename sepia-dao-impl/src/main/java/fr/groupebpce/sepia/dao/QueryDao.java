@@ -1,13 +1,15 @@
 package fr.groupebpce.sepia.dao;
 
 import fr.groupebpce.sepia.criteria.GenericCriteria;
-import fr.groupebpce.sepia.criteria.fetching.IFetching;
+import fr.groupebpce.sepia.criteria.fetching.Fetching;
 import fr.groupebpce.sepia.criteria.paging.Paging;
 import fr.groupebpce.sepia.criteria.sorting.Sorting;
 import fr.groupebpce.sepia.dao.domain.GraphType;
 import fr.groupebpce.sepia.dao.domain.Join;
 import fr.groupebpce.sepia.dao.domain.Operator;
 import fr.groupebpce.sepia.dao.domain.QueryParameter;
+import fr.groupebpce.sepia.dao.fetch.EntityGraphBuilder;
+import fr.groupebpce.sepia.dao.fetch.EntityGraphList;
 import fr.groupebpce.sepia.exception.EntityNotFoundException;
 import jakarta.persistence.*;
 
@@ -37,9 +39,8 @@ import static org.apache.commons.lang3.StringUtils.uncapitalize;
  *
  * @param <E> : Entity class
  * @param <C> : Criteria type
- * @param <F> : Fetching type
  */
-public abstract class QueryDao<E, C extends GenericCriteria<F>, F extends IFetching> {
+public abstract class QueryDao<E, C extends GenericCriteria> {
 
     // ========== ATTRIBUTES ==========
 
@@ -71,13 +72,16 @@ public abstract class QueryDao<E, C extends GenericCriteria<F>, F extends IFetch
      */
     public List<E> search(C criteria) {
 
-        QueryContext<C, F> context = generateContext(criteria);
+        QueryContext<C> context = generateContext(criteria);
 
         // ========== FILTERING ==========
         filter(context);
 
         // ========== FETCHING ==========
-        EntityGraph<E> graph = generateGraph(criteria.getFetching());
+        EntityGraphBuilder<E> builder = new EntityGraphBuilder<>(entityManager, entityClass);
+        EntityGraphList<E> graphs = builder.build(criteria.getFetching());
+        EntityGraph<E> graph = graphs.getMainEntityGraph();
+        
 
         // ========== QUERY ==========
 
@@ -99,7 +103,7 @@ public abstract class QueryDao<E, C extends GenericCriteria<F>, F extends IFetch
         List<E> resultList = query.getResultList();
         if (nonNull(criteria.getFetching()) && isNotEmpty(resultList)) {
             context.clearJoins();
-            fetchSublists(resultList, criteria.getFetching());
+            fetchSublists(resultList, graphs.getCollectionEntityGraphs());
         }
 
         return resultList;
@@ -127,7 +131,7 @@ public abstract class QueryDao<E, C extends GenericCriteria<F>, F extends IFetch
      */
     public Long count(C criteria) {
 
-        QueryContext<C, F> context = generateContext(criteria);
+        QueryContext<C> context = generateContext(criteria);
 
         // ========== FILTERING ==========
         filter(context);
@@ -152,7 +156,7 @@ public abstract class QueryDao<E, C extends GenericCriteria<F>, F extends IFetch
      */
     public boolean exists(C criteria) {// saves initial state
         Paging paging = criteria.getPaging();
-        F fetching = criteria.getFetching();
+        Fetching fetching = criteria.getFetching();
         List<Sorting> ordering = criteria.getOrdering();
         // overrides
         criteria.setPaging(new Paging().pageNumber(1).pageSize(1));
@@ -183,26 +187,27 @@ public abstract class QueryDao<E, C extends GenericCriteria<F>, F extends IFetch
         return entity;
     }
 
-    public E find(Serializable id, F fetching) {
-        Map<String, Object> props = Map.of(getGraphType().getCode(), generateGraph(fetching));
+    public E find(Serializable id, Fetching fetching) {
+
+        EntityGraphBuilder<E> builder = new EntityGraphBuilder<>(entityManager, entityClass);
+        EntityGraphList<E> graphs = builder.build(fetching);
+        Map<String, Object> props = Map.of(getGraphType().getCode(), graphs.getMainEntityGraph());
 
         E entity = entityManager.find(getEntityClass(), id, props);
         if (isNull(entity)) {
             throw new EntityNotFoundException(id, getEntityName());
         }
-
-        if (nonNull(fetching)) {
-            fetchSublists(List.of(entity), fetching);
+        
+        if (isNotEmpty(graphs.getCollectionEntityGraphs())) {
+            fetchSublists(List.of(entity), graphs.getCollectionEntityGraphs());
         }
         return entity;
-
     }
-
 
     // ========== To be implemented / overridden ==========
 
-    protected abstract void filter(QueryContext<C, F> context);
-
+    protected abstract void filter(QueryContext<C> context);
+    
     /**
      * Fills the EntityGraph that will fetch all mentioned attributes of the entity.
      * It can also include (maximum) one sublist.
@@ -211,7 +216,7 @@ public abstract class QueryDao<E, C extends GenericCriteria<F>, F extends IFetch
      * @param graph    : the graph that will be used by the query to fetch the data
      * @param fetching : contains data to be fetched
      */
-    protected void fetch(EntityGraph<E> graph, F fetching) {
+    protected void fetch(EntityGraph<E> graph, Fetching fetching) {
     }
 
     /**
@@ -219,21 +224,11 @@ public abstract class QueryDao<E, C extends GenericCriteria<F>, F extends IFetch
      * It is used to load several sublists of the entities contained in the result list.
      *
      * @param list     : result list from the query using the conditions and parameters
-     * @param fetching : contains data to be fetched
+     * @param graphs : list of EntityGraph to fetch
      */
-    protected void fetchSublists(List<E> list, F fetching) {
+    private void fetchSublists(List<E> list, List<EntityGraph<E>> graphs) {
+        graphs.forEach(graph -> fetchSublist(list, graph, getEntityClass()));
     }
-
-    /**
-     * This method allows to fetch a subgraph of all entities contained in the list provided in parameter.
-     *
-     * @param list  : result list from the 1st query executed, considering the conditions set by the child Dao
-     * @param graph : EntityGraph that will fetch a sublist of all entities contained in the list.
-     */
-    protected void fetchSublist(List<E> list, EntityGraph<E> graph) {
-        fetchSublist(list, graph, getEntityClass());
-    }
-
 
     /**
      * This method allows to fetch a subgraph of all entities contained in the list provided in parameter.
@@ -242,7 +237,7 @@ public abstract class QueryDao<E, C extends GenericCriteria<F>, F extends IFetch
      * @param graph : EntityGraph that will fetch a sublist of all entities contained in the list.
      * @param clazz : the root class of the graph
      */
-    protected <S> void fetchSublist(List<S> list, EntityGraph<S> graph, Class<S> clazz) {
+    private <S> void fetchSublist(List<S> list, EntityGraph<S> graph, Class<S> clazz) {
         String jpql = "select e from " + clazz.getSimpleName() + " e where e in :list ";
         TypedQuery<S> query = entityManager.createQuery(jpql, clazz);
         if (graph != null) {
@@ -252,39 +247,10 @@ public abstract class QueryDao<E, C extends GenericCriteria<F>, F extends IFetch
         query.getResultList();
     }
 
-    /**
-     * This method allows to fetch a set of lists using join fetch into all entities contained in the list provided in parameter.
-     *
-     * @param list    : result list from the 1st query executed, considering the conditions set by the child Dao
-     * @param context : SearchContext containing the list of fetchs to be done.
-     */
-    protected void fetchSublist(List<E> list, QueryContext<C, F> context) {
-        String jpql = new StringJoiner(" ")
-                .add(select())
-                .add(from())
-                .add(join(context))
-                .add("where").add(getAliasName()).add("in :list")
-                .toString();
-        entityManager.createQuery(jpql, getEntityClass())
-                .setParameter("list", list)
-                .getResultList();
-
-        // clear context joins
-        context.clearJoins();
-    }
-
-    private static <C extends GenericCriteria<F>, F extends IFetching> QueryContext<C, F> generateContext(C criteria) {
-        QueryContext<C, F> context = new QueryContext<>();
+    private static <C extends GenericCriteria> QueryContext<C> generateContext(C criteria) {
+        QueryContext<C> context = new QueryContext<>();
         context.setCriteria(criteria);
         return context;
-    }
-
-    private EntityGraph<E> generateGraph(F fetching) {
-        EntityGraph<E> graph = entityManager.createEntityGraph(getEntityClass());
-        if (nonNull(fetching)) {
-            fetch(graph, fetching);
-        }
-        return graph;
     }
 
     private TypedQuery<E> generateQuery(C criteria, String jpql, EntityGraph<E> graph) {
@@ -342,7 +308,7 @@ public abstract class QueryDao<E, C extends GenericCriteria<F>, F extends IFetch
     /**
      * Generates the JOIN clause of the jpql query
      */
-    private String join(QueryContext<C, F> context) {
+    private String join(QueryContext<C> context) {
         return context.getJoins().stream()
                 .map(Join::getJoinClause)
                 .collect(joining());
@@ -351,7 +317,7 @@ public abstract class QueryDao<E, C extends GenericCriteria<F>, F extends IFetch
     /**
      * Generates the JOIN clause of the jpql query (ignor
      */
-    private String joinWithoutFetch(QueryContext<C, F> context) {
+    private String joinWithoutFetch(QueryContext<C> context) {
         return context.getJoins().stream()
                 .map(Join::getJoinClauseWithoutFetch)
                 .collect(joining());
@@ -360,7 +326,7 @@ public abstract class QueryDao<E, C extends GenericCriteria<F>, F extends IFetch
     /**
      * Generates the WHERE clause of the jpql query
      */
-    private String where(QueryContext<C, F> context) {
+    private String where(QueryContext<C> context) {
         StringJoiner jpql = new StringJoiner(" ")
                 .add("WHERE").add(getOperator().trueConditionTrick());
         context.getConditions().forEach(condition -> jpql.add(getOperator().name()).add(condition));

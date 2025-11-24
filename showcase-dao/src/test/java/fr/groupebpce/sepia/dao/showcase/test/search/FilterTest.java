@@ -1,15 +1,13 @@
 package fr.groupebpce.sepia.dao.showcase.test.search;
 
+import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.ShowcaseApplication;
 import fr.groupebpce.sepia.dao.showcase.cache.ClubCache;
 import fr.groupebpce.sepia.dao.showcase.dao.club.ClubCriteria;
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubDao;
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubFetching;
 import fr.groupebpce.sepia.dao.showcase.dao.country.CountryCriteria;
 import fr.groupebpce.sepia.dao.showcase.dao.country.CountryDao;
 import fr.groupebpce.sepia.dao.showcase.entity.Club;
 import fr.groupebpce.sepia.dao.showcase.entity.Country;
-import fr.groupebpce.sepia.dao.showcase.entity.Stadium;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +27,7 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class FilterTest {
 
-    final ClubDao clubDao;
+    final ClubService clubService;
     final CountryDao countryDao;
     final ClubCache clubCache;
     List<Club> allClubsSortedByName;
@@ -39,15 +37,15 @@ class FilterTest {
     @BeforeAll
     void loadCache() {
         countryDao.search(new CountryCriteria());
-        allClubsSortedByName = clubDao.search(new ClubCriteria());
+        allClubsSortedByName = clubService.search(new ClubCriteria());
         allClubsSortedByName.sort(clubNameComparator);
     }
 
     @Test
     void selectAllClubsWithStadiumCapacityBetween50000And80000() {
-        List<Club> clubsFromDb = clubDao.search(new ClubCriteria()
+        List<Club> clubsFromDb = clubService.search(new ClubCriteria()
                 .stadiumCapacityIn(50_000, 80_000)
-                .fetching(new ClubFetching().stadium(true))
+                .fetch("stadium")
         );
 
         List<Club> clubsMem = clubCache.getClubs().stream()
@@ -60,7 +58,7 @@ class FilterTest {
 
     @Test
     void selectAllFrenchClubs() {
-        List<Club> clubsFromDb = clubDao.search(new ClubCriteria()
+        List<Club> clubsFromDb = clubService.search(new ClubCriteria()
                 .countryIs(new Country().code("FRA"))
         );
 

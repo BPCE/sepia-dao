@@ -1,10 +1,9 @@
 package fr.groupebpce.sepia.dao.showcase.test.exist;
 
+import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.ShowcaseApplication;
 import fr.groupebpce.sepia.dao.showcase.cache.ClubCache;
 import fr.groupebpce.sepia.dao.showcase.dao.club.ClubCriteria;
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubDao;
-import fr.groupebpce.sepia.dao.showcase.dao.country.CountryDao;
 import fr.groupebpce.sepia.dao.showcase.entity.Club;
 import fr.groupebpce.sepia.dao.showcase.entity.Country;
 import fr.groupebpce.sepia.dao.showcase.entity.Stadium;
@@ -15,7 +14,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
@@ -26,13 +24,12 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ExistsTest {
 
-    final ClubDao clubDao;
+    final ClubService clubService;
     final ClubCache clubCache;
 
     @Test
-    @Transactional
     void notExist_ClubsWithNameContainingLl() {
-        boolean dbExists = clubDao.exists(new ClubCriteria().nameLike("LL"));
+        boolean dbExists = clubService.exists(new ClubCriteria().nameLike("LL"));
 
         boolean inMemExists = clubCache.getClubs().stream()
                 .map(Club::getName)
@@ -43,9 +40,8 @@ class ExistsTest {
     }
 
     @Test
-    @Transactional
     void notExist_ClubsWithStadiumNameContainingNa() {
-        boolean dbExists = clubDao.exists(new ClubCriteria().stadiumNameLike("NA"));
+        boolean dbExists = clubService.exists(new ClubCriteria().stadiumNameLike("NA"));
 
         boolean inMemExists = clubCache.getClubs().stream()
                 .map(Club::getStadium)
@@ -57,9 +53,8 @@ class ExistsTest {
     }
 
     @Test
-    @Transactional
     void notExist_ClubsWithStadiumCapacityGreaterThan200000() {
-        boolean dbNotExist = clubDao.notExist(new ClubCriteria()
+        boolean dbNotExist = clubService.notExist(new ClubCriteria()
                 .stadiumCapacityGreaterThan(200_000)
         );
 
@@ -73,9 +68,8 @@ class ExistsTest {
     }
 
     @Test
-    @Transactional
     void notExist_brazilianClub() {
-        boolean dbNotExist = clubDao.notExist(new ClubCriteria()
+        boolean dbNotExist = clubService.notExist(new ClubCriteria()
                 .countryIs(new Country().code("BRA"))
         );
 

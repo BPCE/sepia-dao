@@ -38,6 +38,19 @@ public class Club {
     @OneToMany(mappedBy = "club", cascade = CascadeType.ALL)
     private List<Player> players;
 
+    // ========== Fluent Setters ==========
+
+    public Club code(String code) {
+        this.code = code;
+        return this;
+    }
+
+    public Club name(String name) {
+        this.name = name;
+        return this;
+    }
+
+
     // ========== Object ==========
 
     @Override

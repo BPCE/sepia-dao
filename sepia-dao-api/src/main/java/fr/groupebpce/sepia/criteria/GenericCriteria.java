@@ -1,30 +1,36 @@
 package fr.groupebpce.sepia.criteria;
 
-import fr.groupebpce.sepia.criteria.fetching.IFetching;
+import fr.groupebpce.sepia.criteria.fetching.Fetching;
 import fr.groupebpce.sepia.criteria.paging.Paging;
 import fr.groupebpce.sepia.criteria.sorting.Sorting;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class GenericCriteria<T extends IFetching> {
+@Getter
+@Setter
+public abstract class GenericCriteria {
 
-    // ========== ATTRIBUTES ==========
     private List<Sorting> ordering;
     private Paging paging;
-    private T fetching;
+    private Fetching fetching;
 
-    // ========== CONSTRUCTOR ==========
-
-    protected GenericCriteria() {
+    public GenericCriteria fetch(String... paths) {
+        return fetching(Fetching.fetch(paths));
+    }
+    
+    
+    public GenericCriteria fetching(Fetching fetching) {
+        this.fetching = fetching;
+        return this;
     }
 
-    // ========== GETTER & SETTER ==========
-
     /**
-     * setter of the {@link #ordering} attribute.
+     * Setter of the {@link #ordering} attribute.
      * replaces the contents of the {@link #ordering} list by the Sorting param list
      * @param ordering
      */
@@ -38,7 +44,7 @@ public abstract class GenericCriteria<T extends IFetching> {
      * @param sorting
      * @return this
      */
-    public GenericCriteria<T> orderBy(Sorting... sorting) {
+    public GenericCriteria orderBy(Sorting... sorting) {
         if (this.ordering == null) {
             this.ordering = new ArrayList<>();
         }
@@ -50,33 +56,13 @@ public abstract class GenericCriteria<T extends IFetching> {
         return this;
     }
 
-    public final List<Sorting> getOrdering() {
-        return ordering;
-    }
-
-    public final T getFetching() {
-        return fetching;
-    }
-
-    public final void setFetching(T fetching) {
-        this.fetching = fetching;
-    }
-
-    public final Paging getPaging() {
-        return paging;
-    }
-
-    public final void setPaging(Paging paging) {
-        this.paging = paging;
-    }
-
     // ========== OBJECT ==========
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        GenericCriteria<?> that = (GenericCriteria<?>) o;
+        GenericCriteria that = (GenericCriteria) o;
         return Objects.equals(ordering, that.ordering) &&
                 Objects.equals(paging, that.paging) &&
                 Objects.equals(fetching, that.fetching);

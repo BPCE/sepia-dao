@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CountryCriteria extends GenericCriteria<NoFetching> {
+public class CountryCriteria extends GenericCriteria {
     
     
 }

@@ -23,19 +23,14 @@ import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Repository
-public class ClubDao extends QueryDao<Club, ClubCriteria, ClubFetching> {
+public class ClubDao extends QueryDao<Club, ClubCriteria> {
 
     public ClubDao() {
         super(Club.class);
     }
 
     @Override
-    protected void filter(QueryContext<ClubCriteria, ClubFetching> context) {
-
-        EntityType<Club> entityType = entityManager.getMetamodel().entity(Club.class);
-        Set<SingularAttribute<Club, ?>> singularAttributes = entityType.getDeclaredSingularAttributes();
-        Set<PluralAttribute<Club, ?, ?>> declaredPluralAttributes = entityType.getDeclaredPluralAttributes();
-
+    protected void filter(QueryContext<ClubCriteria> context) {
 
         ClubCriteria criteria = context.getCriteria();
 
@@ -87,22 +82,12 @@ public class ClubDao extends QueryDao<Club, ClubCriteria, ClubFetching> {
 
     }
 
-    @Override
     protected void fetch(EntityGraph<Club> graph, ClubFetching fetching) {
         if (isTrue(fetching.getStadium())) {
             graph.addSubgraph("stadium")
                     .addSubgraph("address")
                     .addSubgraph("city")
                     ;
-        }
-    }
-
-    @Override
-    protected void fetchSublists(List<Club> list, ClubFetching fetching) {
-        if (isTrue(fetching.getPlayers())) {
-            EntityGraph<Club> graph = entityManager.createEntityGraph(Club.class);
-            graph.addSubgraph("players");
-            fetchSublist(list, graph);
         }
     }
 

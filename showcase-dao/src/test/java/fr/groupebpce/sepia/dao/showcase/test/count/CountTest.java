@@ -1,9 +1,9 @@
 package fr.groupebpce.sepia.dao.showcase.test.count;
 
+import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.ShowcaseApplication;
 import fr.groupebpce.sepia.dao.showcase.cache.ClubCache;
 import fr.groupebpce.sepia.dao.showcase.dao.club.ClubCriteria;
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubDao;
 import fr.groupebpce.sepia.dao.showcase.entity.Club;
 import fr.groupebpce.sepia.dao.showcase.entity.Country;
 import fr.groupebpce.sepia.dao.showcase.entity.Stadium;
@@ -15,8 +15,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.function.Predicate;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
@@ -26,12 +24,12 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CountTest {
 
-    final ClubDao clubDao;
+    final ClubService clubService;
     final ClubCache clubCache;
 
     @Test
     void countAllClubsWithNameContainingLl() {
-        long dbCount = clubDao.count(new ClubCriteria().nameLike("LL"));
+        long dbCount = clubService.count(new ClubCriteria().nameLike("LL"));
         
         long inMemCount = clubCache.getClubs().stream()
                 .map(Club::getName)
@@ -44,7 +42,7 @@ class CountTest {
 
     @Test
     void countAllClubsWithStadiumNameContainingNa() {
-        Long dbCount = clubDao.count(new ClubCriteria().stadiumNameLike("NA"));
+        Long dbCount = clubService.count(new ClubCriteria().stadiumNameLike("NA"));
 
         long inMemCount = clubCache.getClubs().stream()
                 .map(Club::getStadium)
@@ -59,7 +57,7 @@ class CountTest {
 
     @Test
     void countAllClubsWithStadiumCapacityBetween50000And80000() {
-        Long dbCount = clubDao.count(new ClubCriteria()
+        Long dbCount = clubService.count(new ClubCriteria()
                 .stadiumCapacityIn(50_000, 80_000)
         );
 
@@ -75,7 +73,7 @@ class CountTest {
 
     @Test
     void countAllFrenchClubs() {
-        Long dbCount = clubDao.count(new ClubCriteria()
+        Long dbCount = clubService.count(new ClubCriteria()
                 .countryIs(new Country().code("FRA"))
         );
 

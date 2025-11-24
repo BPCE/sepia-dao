@@ -1,10 +1,9 @@
 package fr.groupebpce.sepia.dao.showcase.test.search;
 
+import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.ShowcaseApplication;
 import fr.groupebpce.sepia.dao.showcase.cache.ClubCache;
 import fr.groupebpce.sepia.dao.showcase.dao.club.ClubCriteria;
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubDao;
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubFetching;
 import fr.groupebpce.sepia.dao.showcase.dao.country.CountryCriteria;
 import fr.groupebpce.sepia.dao.showcase.dao.country.CountryDao;
 import fr.groupebpce.sepia.dao.showcase.entity.Club;
@@ -18,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 import static fr.groupebpce.sepia.dao.showcase.utils.ClubDisplayer.display;
-import static fr.groupebpce.sepia.dao.showcase.utils.ClubDisplayer.displayWithStadium;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
@@ -28,7 +26,7 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class FilterLikeTest {
 
-    final ClubDao clubDao;
+    final ClubService clubService;
     final CountryDao countryDao;
     final ClubCache clubCache;
     
@@ -42,7 +40,7 @@ class FilterLikeTest {
 
     @Test
     void selectAllClubsWithNameContainingLl() {
-        List<Club> clubsFromDb = clubDao.search(new ClubCriteria().nameLike("LL"));
+        List<Club> clubsFromDb = clubService.search(new ClubCriteria().nameLike("LL"));
         
         List<Club> clubsFromMem = clubCache.getClubs().stream()
                 .filter(club -> club.getName().toUpperCase().contains("LL"))
@@ -54,9 +52,9 @@ class FilterLikeTest {
 
     @Test
     void selectAllClubsWithStadiumNameContainingNa() {
-        List<Club> clubsFromDb = clubDao.search(new ClubCriteria()
+        List<Club> clubsFromDb = clubService.search(new ClubCriteria()
                 .stadiumNameLike("NA")
-                .fetching(new ClubFetching().stadium(true))
+                .fetch("stadium")
         );
 
         List<Club> clubsFromMem = clubCache.getClubs().stream()

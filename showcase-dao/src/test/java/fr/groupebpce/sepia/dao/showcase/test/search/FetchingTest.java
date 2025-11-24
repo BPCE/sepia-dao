@@ -1,9 +1,9 @@
 package fr.groupebpce.sepia.dao.showcase.test.search;
 
+import fr.groupebpce.sepia.dao.showcase.dao.club.ClubDao;
+import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.ShowcaseApplication;
 import fr.groupebpce.sepia.dao.showcase.dao.club.ClubCriteria;
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubDao;
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubFetching;
 import fr.groupebpce.sepia.dao.showcase.dao.country.CountryCriteria;
 import fr.groupebpce.sepia.dao.showcase.dao.country.CountryDao;
 import fr.groupebpce.sepia.dao.showcase.entity.Club;
@@ -12,10 +12,10 @@ import org.hibernate.LazyInitializationException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static fr.groupebpce.sepia.criteria.fetching.Fetching.fetch;
 import static fr.groupebpce.sepia.dao.showcase.utils.ClubDisplayer.displayWithStadium;
 import static fr.groupebpce.sepia.dao.showcase.utils.ClubDisplayer.displayWithStadiumAndPlayers;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class FetchingTest {
 
+    final ClubService clubService;
     final ClubDao clubDao;
     final CountryDao countryDao;
 
@@ -38,8 +39,8 @@ class FetchingTest {
 
     @Test
     void selectAllClubsWithStadium() {
-        List<Club> clubs = clubDao.search(new ClubCriteria()
-                .fetching(new ClubFetching().stadium(true)));
+        List<Club> clubs = clubService.search(new ClubCriteria()
+                .fetching(fetch("stadium")));
         displayWithStadium(clubs);
         assertThat(clubs).extracting("stadium").doesNotContainNull();
     }
@@ -47,15 +48,14 @@ class FetchingTest {
     @Test
     void selectAllClubsWithStadiumAndPlayers_NotUsingTransaction() {
         List<Club> clubs = clubDao.search(new ClubCriteria()
-                .fetching(new ClubFetching().stadium(true).players(true)));
+                .fetch("stadium", "players"));
         assertThrows(LazyInitializationException.class, () -> displayWithStadiumAndPlayers(clubs));
     }
 
     @Test
-    @Transactional
     void selectAllClubsWithStadiumAndPlayers_UsingTransaction() {
-        List<Club> clubs = clubDao.search(new ClubCriteria()
-                .fetching(new ClubFetching().stadium(true).players(true)));
+        List<Club> clubs = clubService.search(new ClubCriteria()
+                .fetch("stadium", "players"));
         displayWithStadiumAndPlayers(clubs);
         assertThat(clubs).extracting("stadium").doesNotContainNull();
     }

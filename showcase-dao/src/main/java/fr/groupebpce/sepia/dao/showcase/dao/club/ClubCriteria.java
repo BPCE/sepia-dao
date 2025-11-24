@@ -1,6 +1,7 @@
 package fr.groupebpce.sepia.dao.showcase.dao.club;
 
 import fr.groupebpce.sepia.criteria.GenericCriteria;
+import fr.groupebpce.sepia.criteria.fetching.Fetching;
 import fr.groupebpce.sepia.criteria.filter.Range;
 import fr.groupebpce.sepia.criteria.filter.StringFilter;
 import fr.groupebpce.sepia.criteria.paging.Paging;
@@ -9,13 +10,15 @@ import fr.groupebpce.sepia.dao.showcase.entity.Country;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import static java.util.Objects.isNull;
 
 @Getter
 @Setter
-public class ClubCriteria extends GenericCriteria<ClubFetching> {
+public class ClubCriteria extends GenericCriteria {
 
     /**
      * Club's name must be like
@@ -104,12 +107,18 @@ public class ClubCriteria extends GenericCriteria<ClubFetching> {
         super.setPaging(paging);
         return this;
     }
-    
-    public ClubCriteria fetching(ClubFetching fetching) {
-        super.setFetching(fetching);
+
+    public ClubCriteria fetching(Fetching fetching) {
+        super.fetching(fetching);
         return this;
     }
-    
+
+    @Override
+    public ClubCriteria fetch(String... paths) {
+        super.fetch(paths);
+        return this;
+    }
+
     public ClubCriteria orderBy(Sorting... sortings) {
         super.orderBy(sortings);
         return this;

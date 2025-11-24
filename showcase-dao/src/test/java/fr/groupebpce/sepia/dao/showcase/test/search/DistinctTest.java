@@ -1,20 +1,17 @@
 package fr.groupebpce.sepia.dao.showcase.test.search;
 
+import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.ShowcaseApplication;
 import fr.groupebpce.sepia.dao.showcase.cache.ClubCache;
 import fr.groupebpce.sepia.dao.showcase.dao.club.ClubCriteria;
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubDao;
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubFetching;
 import fr.groupebpce.sepia.dao.showcase.dao.country.CountryCriteria;
 import fr.groupebpce.sepia.dao.showcase.dao.country.CountryDao;
 import fr.groupebpce.sepia.dao.showcase.entity.Club;
 import fr.groupebpce.sepia.dao.showcase.entity.Country;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,7 +25,7 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DistinctTest {
 
-    final ClubDao clubDao;
+    final ClubService clubService;
     final CountryDao countryDao;
     final ClubCache clubCache;
 
@@ -38,11 +35,11 @@ class DistinctTest {
     }
 
     @Test
-    @Transactional
     void selectAllClubsWithPlayers() {
-        List<Club> clubsDb = clubDao.search(new ClubCriteria()
+        List<Club> clubsDb = clubService.search(new ClubCriteria()
                 .hasPlayerOfNationality(new Country().code("FRA"))
-                .fetching(new ClubFetching().players(true)));
+                .fetch("stadium", "players")
+        );
         List<Club> clubsMem = clubCache.getClubs().stream()
                 .filter(club -> club.getPlayers().stream().anyMatch(player -> "FRA".equals(player.getCountry().getCode())))
                 .toList();

@@ -1,8 +1,7 @@
 package fr.groupebpce.sepia.dao.showcase.test.find;
 
+import fr.groupebpce.sepia.dao.showcase.dao.club.ClubService;
 import fr.groupebpce.sepia.dao.showcase.ShowcaseApplication;
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubDao;
-import fr.groupebpce.sepia.dao.showcase.dao.club.ClubFetching;
 import fr.groupebpce.sepia.dao.showcase.dao.country.CountryCriteria;
 import fr.groupebpce.sepia.dao.showcase.dao.country.CountryDao;
 import fr.groupebpce.sepia.dao.showcase.entity.Club;
@@ -10,8 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
+import static fr.groupebpce.sepia.criteria.fetching.Fetching.fetch;
 import static fr.groupebpce.sepia.dao.showcase.utils.ClubDisplayer.display;
 import static fr.groupebpce.sepia.dao.showcase.utils.ClubDisplayer.displayWithStadiumAndPlayers;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,9 +22,9 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class FindTest {
 
-    final ClubDao clubDao;
     final CountryDao countryDao;
-    
+    final ClubService clubService;
+
 
     @BeforeAll
     void loadCache() {
@@ -33,18 +32,16 @@ class FindTest {
     }
 
     @Test
-    @Transactional
-    void findPsg() {
-        Club club = clubDao.find("PSG");
+    void findPsg_test() {
+        Club club = clubService.find("PSG");
         display(club);
         assertThat(club).isNotNull();
         assertThat(club.getCode()).isEqualTo("PSG");
     }
 
     @Test
-    @Transactional
     void findPsgWithPlayers() {
-        Club club = clubDao.find("PSG", new ClubFetching().stadium(true).players(true));
+        Club club = clubService.find("PSG", fetch("stadium.address.city", "players"));
         assertThat(club.getStadium()).isNotNull();
         assertThat(club.getStadium().getName()).isNotEmpty();
         assertThat(club.getPlayers())
@@ -52,6 +49,5 @@ class FindTest {
                 .hasSizeGreaterThan(0);
         displayWithStadiumAndPlayers(club);
     }
-
 
 }

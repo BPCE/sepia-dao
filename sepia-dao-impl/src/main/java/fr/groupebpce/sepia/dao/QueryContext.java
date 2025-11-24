@@ -17,7 +17,7 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
-public class QueryContext<C extends GenericCriteria<F>, F extends IFetching> {
+public class QueryContext<C extends GenericCriteria> {
 
     // ========== ATTRIBUTES ==========
 
@@ -53,7 +53,7 @@ public class QueryContext<C extends GenericCriteria<F>, F extends IFetching> {
     /**
      * Adds one path to be added on the clause, with its alias
      */
-    public QueryContext<C, F> addJoin(String alias, String path) {
+    public QueryContext<C> addJoin(String alias, String path) {
         Optional<Join> join = getJoin(alias);
         if (join.isPresent()) {
             join.get().type(INNER);
@@ -63,7 +63,7 @@ public class QueryContext<C extends GenericCriteria<F>, F extends IFetching> {
         return this;
     }
 
-    public QueryContext<C, F> addJoinFetch(String alias, String path) {
+    public QueryContext<C> addJoinFetch(String alias, String path) {
         Optional<Join> join = getJoin(alias);
         if (join.isPresent()) {
             join.get()
@@ -75,7 +75,7 @@ public class QueryContext<C extends GenericCriteria<F>, F extends IFetching> {
         return this;
     }
 
-    public QueryContext<C, F> addLeftJoin(String alias, String path) {
+    public QueryContext<C> addLeftJoin(String alias, String path) {
         Optional<Join> join = getJoin(alias);
         if (join.isEmpty()) {
             addJoin(LEFT, alias, path);
@@ -83,7 +83,7 @@ public class QueryContext<C extends GenericCriteria<F>, F extends IFetching> {
         return this;
     }
 
-    public QueryContext<C, F> addLeftJoinFetch(String alias, String path) {
+    public QueryContext<C> addLeftJoinFetch(String alias, String path) {
         Optional<Join> join = getJoin(alias);
         if (join.isPresent()) {
             join.get()
@@ -122,7 +122,7 @@ public class QueryContext<C extends GenericCriteria<F>, F extends IFetching> {
      *
      * @param condition : condition to be added (not beginning by an operator, directly after)
      */
-    public QueryContext<C, F> addCondition(String condition) {
+    public QueryContext<C> addCondition(String condition) {
         getConditions().add(condition);
         return this;
     }
@@ -134,7 +134,7 @@ public class QueryContext<C extends GenericCriteria<F>, F extends IFetching> {
      * @param paramAlias   : alias of the parameter in the query (ex: "stadiumName")
      * @param stringFilter : object containing the string to search and indicating if the search is exact or not
      */
-    public QueryContext<C, F> addStringCondition(String path, String paramAlias, StringFilter stringFilter) {
+    public QueryContext<C> addStringCondition(String path, String paramAlias, StringFilter stringFilter) {
         if (nonNull(stringFilter) && isNotEmpty(stringFilter.getValue())) {
             addCondition("{path} {operator} :{paramAlias}"
                     .replace("{path}", formatUpper(path, stringFilter.getIsIgnoreCase()))
@@ -160,7 +160,7 @@ public class QueryContext<C extends GenericCriteria<F>, F extends IFetching> {
      * @param paramAlias : alias of the parameter in the query (ex: "stadiumName")
      * @param paramValue : par of the parameter in the query (ex: "AreNa")
      */
-    public QueryContext<C, F> addLikeCondition(String path, String paramAlias, String paramValue) {
+    public QueryContext<C> addLikeCondition(String path, String paramAlias, String paramValue) {
         addLikeCondition(path, paramAlias, paramValue, false);
         return this;
     }
@@ -174,7 +174,7 @@ public class QueryContext<C extends GenericCriteria<F>, F extends IFetching> {
      * @param paramAlias : alias of the parameter in the query (ex: "stadiumName")
      * @param paramValue : par of the parameter in the query (ex: "AreNa")
      */
-    public QueryContext<C, F> addLikeCondition(String path, String paramAlias, String paramValue, boolean isIgnoreCase) {
+    public QueryContext<C> addLikeCondition(String path, String paramAlias, String paramValue, boolean isIgnoreCase) {
         addCondition(formatUpper(path, isIgnoreCase) + " like :" + paramAlias);
         addParameter(paramAlias, formatLike(paramValue, isIgnoreCase));
         return this;
@@ -206,7 +206,7 @@ public class QueryContext<C extends GenericCriteria<F>, F extends IFetching> {
     /**
      * Adds one parameter to be added on the query, with its alias
      */
-    public QueryContext<C, F> addParameter(String alias, Object value) {
+    public QueryContext<C> addParameter(String alias, Object value) {
         if (value instanceof Date) {
             params.put(alias, new QueryParameter(alias, value, TemporalType.DATE));
         } else {
@@ -215,7 +215,7 @@ public class QueryContext<C extends GenericCriteria<F>, F extends IFetching> {
         return this;
     }
 
-    public QueryContext<C, F> addParameter(String alias, Object value, TemporalType type) {
+    public QueryContext<C> addParameter(String alias, Object value, TemporalType type) {
         params.put(alias, new QueryParameter(alias, value, type));
         return this;
     }
