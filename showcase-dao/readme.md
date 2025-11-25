@@ -23,9 +23,9 @@ Once you've done that, you can invoke the `QueryDao.search()` method with any co
 #### Dynamic fetching
 
 In parallel of filtering, the data that we need to fetch from the database may vary depending on the use cases, and then, can represent a lot of different combinations in itself too.
-To handle that with minimum rows of code, a part of the Criteria is dedicated to the Fetching.
-The implementation of each `Fecthing` will contain different attributes to indicate the QueryDao which property to fetch.
-Again, for each potential data to fetch, you only need once to precise the QueryDao how to load these data.
+To handle that with minimum rows of code, a part of the `GenericCriteria` is dedicated to the `Fecthing`.
+The `Fecthing` indicate the QueryDao which property to fetch by providing their paths in a list.
+Then, the `QueryDao` will use the list of paths to fetch everything automatically.
 
 #### Services for free
 
@@ -34,5 +34,6 @@ You also have :
 - `count()` : returns the number of rows matching the criteria
 - `exists()` : returns a boolean indicating if there is any row matching the criteria
 - `notExist()` : returns the opposite of `exists()` (for readability purpose, avoids usage of `!`)
-- `searchOne()` : returns the (supposedly) only single row matching the criteria (if exists) as an `Optional` (instead of a `List` if invoking `search()`)
+- `searchOne()` : returns the (supposedly) only single entity matching the criteria (if exists) as an `Optional` (instead of a `List` if invoking `search()`)
+- `find()` : returns the entity matching the primary key provided
 The QueryDao is able to provide all these services since the global query is predictable in each case, and the only thing
