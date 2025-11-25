@@ -8,9 +8,9 @@ import lombok.Getter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
-@Getter
 public class ClubCache {
 
     @PersistenceContext
@@ -18,7 +18,12 @@ public class ClubCache {
 
     private List<Club> clubs;
 
-    @PostConstruct
+    public List<Club> getClubs() {
+        if (Objects.isNull(clubs))
+            loadAllClubs();
+        return clubs;
+    }
+
     public void loadAllClubs() {
         clubs = em.createQuery("""
                 from Club club
