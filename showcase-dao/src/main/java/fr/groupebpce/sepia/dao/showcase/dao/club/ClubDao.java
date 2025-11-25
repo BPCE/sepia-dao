@@ -4,12 +4,10 @@ import fr.groupebpce.sepia.criteria.sorting.Sorting;
 import fr.groupebpce.sepia.dao.QueryContext;
 import fr.groupebpce.sepia.dao.QueryDao;
 import fr.groupebpce.sepia.dao.showcase.entity.Club;
-import jakarta.persistence.EntityGraph;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Repository
@@ -70,15 +68,6 @@ public class ClubDao extends QueryDao<Club, ClubCriteria> {
                     .addLikeCondition("players.name", "playerName", criteria.getPlayerName());
         }
 
-    }
-
-    protected void fetch(EntityGraph<Club> graph, ClubFetching fetching) {
-        if (isTrue(fetching.getStadium())) {
-            graph.addSubgraph("stadium")
-                    .addSubgraph("address")
-                    .addSubgraph("city")
-                    ;
-        }
     }
 
     @Override

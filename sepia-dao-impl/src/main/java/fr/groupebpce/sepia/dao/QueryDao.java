@@ -98,7 +98,9 @@ public abstract class QueryDao<E, C extends GenericCriteria> {
         List<E> resultList = query.getResultList();
         if (nonNull(criteria.getFetching()) && isNotEmpty(resultList)) {
             context.clearJoins();
-            fetchSublists(resultList, graphGenerator.getCollectionEntityGraphs());
+            if (isNotEmpty(graphGenerator.getCollectionEntityGraphs())) {
+                fetchSublists(resultList, graphGenerator.getCollectionEntityGraphs());
+            }
         }
 
         return resultList;

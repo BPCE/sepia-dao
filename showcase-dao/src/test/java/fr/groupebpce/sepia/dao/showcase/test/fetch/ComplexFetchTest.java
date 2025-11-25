@@ -70,7 +70,7 @@ class ComplexFetchTest {
                         "players.country"
                 )
         );
-
+        
         assertThat(clubDb).isNotNull();
         assertThat(clubDb.getCode()).isEqualTo("PSG");
         assertThat(clubDb.getStadium()).isNotNull();
