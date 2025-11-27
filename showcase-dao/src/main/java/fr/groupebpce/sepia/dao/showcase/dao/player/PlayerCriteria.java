@@ -1,6 +1,6 @@
 package fr.groupebpce.sepia.dao.showcase.dao.player;
 
-import fr.groupebpce.sepia.criteria.GenericCriteria;
+import fr.groupebpce.sepia.criteria.Criteria;
 import fr.groupebpce.sepia.dao.showcase.entity.Club;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +9,7 @@ import java.util.Objects;
 
 @Getter
 @Setter
-public class PlayerCriteria extends GenericCriteria {
+public class PlayerCriteria extends Criteria {
     
     Club club;
 

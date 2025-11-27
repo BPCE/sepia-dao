@@ -1,6 +1,6 @@
 package fr.groupebpce.sepia.dao.showcase.dao.club;
 
-import fr.groupebpce.sepia.criteria.GenericCriteria;
+import fr.groupebpce.sepia.criteria.Criteria;
 import fr.groupebpce.sepia.criteria.fetching.Fetching;
 import fr.groupebpce.sepia.criteria.filter.Range;
 import fr.groupebpce.sepia.criteria.filter.StringFilter;
@@ -16,7 +16,7 @@ import static java.util.Objects.isNull;
 
 @Getter
 @Setter
-public class ClubCriteria extends GenericCriteria {
+public class ClubCriteria extends Criteria {
 
     /**
      * Club's name must be like
