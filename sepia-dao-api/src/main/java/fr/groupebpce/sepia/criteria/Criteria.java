@@ -13,18 +13,18 @@ import java.util.Objects;
 
 @Getter
 @Setter
-public abstract class GenericCriteria {
+public abstract class Criteria {
 
     private List<Sorting> ordering;
     private Paging paging;
     private Fetching fetching;
 
-    public GenericCriteria fetch(String... paths) {
+    public Criteria fetch(String... paths) {
         return fetching(Fetching.fetch(paths));
     }
     
     
-    public GenericCriteria fetching(Fetching fetching) {
+    public Criteria fetching(Fetching fetching) {
         this.fetching = fetching;
         return this;
     }
@@ -44,7 +44,7 @@ public abstract class GenericCriteria {
      * @param sorting
      * @return this
      */
-    public GenericCriteria orderBy(Sorting... sorting) {
+    public Criteria orderBy(Sorting... sorting) {
         if (this.ordering == null) {
             this.ordering = new ArrayList<>();
         }
@@ -62,7 +62,7 @@ public abstract class GenericCriteria {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        GenericCriteria that = (GenericCriteria) o;
+        Criteria that = (Criteria) o;
         return Objects.equals(ordering, that.ordering) &&
                 Objects.equals(paging, that.paging) &&
                 Objects.equals(fetching, that.fetching);

@@ -21,7 +21,8 @@
             <artifactId>sepia-dao-api</artifactId>
             <version>1.0</version>
         </dependency>
-        <!-- JPA API 2.2 -->
+        
+        <!-- JPA API -->
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>

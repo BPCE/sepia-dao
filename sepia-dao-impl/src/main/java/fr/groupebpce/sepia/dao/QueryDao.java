@@ -1,6 +1,6 @@
 package fr.groupebpce.sepia.dao;
 
-import fr.groupebpce.sepia.criteria.GenericCriteria;
+import fr.groupebpce.sepia.criteria.Criteria;
 import fr.groupebpce.sepia.criteria.fetching.Fetching;
 import fr.groupebpce.sepia.criteria.paging.Paging;
 import fr.groupebpce.sepia.criteria.sorting.Sorting;
@@ -39,7 +39,7 @@ import static org.apache.commons.lang3.StringUtils.uncapitalize;
  * @param <E> : Entity class
  * @param <C> : Criteria type
  */
-public abstract class QueryDao<E, C extends GenericCriteria> {
+public abstract class QueryDao<E, C extends Criteria> {
 
     // ========== ATTRIBUTES ==========
 
@@ -233,7 +233,7 @@ public abstract class QueryDao<E, C extends GenericCriteria> {
         query.getResultList();
     }
 
-    private static <C extends GenericCriteria> QueryContext<C> generateContext(C criteria) {
+    private static <C extends Criteria> QueryContext<C> generateContext(C criteria) {
         QueryContext<C> context = new QueryContext<>();
         context.setCriteria(criteria);
         return context;

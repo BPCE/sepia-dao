@@ -1,6 +1,6 @@
 package fr.groupebpce.sepia.dao;
 
-import fr.groupebpce.sepia.criteria.GenericCriteria;
+import fr.groupebpce.sepia.criteria.Criteria;
 import fr.groupebpce.sepia.criteria.filter.StringFilter;
 import fr.groupebpce.sepia.dao.domain.Join;
 import fr.groupebpce.sepia.dao.domain.QueryParameter;
@@ -16,7 +16,7 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
-public class QueryContext<C extends GenericCriteria> {
+public class QueryContext<C extends Criteria> {
 
     // ========== ATTRIBUTES ==========
 
