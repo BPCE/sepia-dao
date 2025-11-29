@@ -70,7 +70,7 @@ public abstract class QueryDao<E, C extends Criteria> {
      */
     public List<E> search(C criteria) {
 
-        QueryContext<C> context = generateContext(criteria);
+        QueryContext<C> context = new QueryContext<>(criteria);
 
         // ========== FILTERING ==========
         filter(context);
@@ -128,7 +128,7 @@ public abstract class QueryDao<E, C extends Criteria> {
      */
     public Long count(C criteria) {
 
-        QueryContext<C> context = generateContext(criteria);
+        QueryContext<C> context = new QueryContext<>(criteria);
 
         // ========== FILTERING ==========
         filter(context);
@@ -231,12 +231,6 @@ public abstract class QueryDao<E, C extends Criteria> {
         }
         query.setParameter("list", list);
         query.getResultList();
-    }
-
-    private static <C extends Criteria> QueryContext<C> generateContext(C criteria) {
-        QueryContext<C> context = new QueryContext<>();
-        context.setCriteria(criteria);
-        return context;
     }
 
     private TypedQuery<E> generateQuery(C criteria, String jpql, EntityGraph<E> graph) {
