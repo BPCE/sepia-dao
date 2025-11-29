@@ -6,6 +6,7 @@ import fr.groupebpce.sepia.dao.domain.Join;
 import fr.groupebpce.sepia.dao.domain.QueryParameter;
 import jakarta.persistence.TemporalType;
 import jakarta.persistence.criteria.JoinType;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -16,11 +17,12 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
+@Getter
 public class QueryContext<C extends Criteria> {
 
     // ========== ATTRIBUTES ==========
 
-    private C criteria;
+    private final C criteria;
 
     private final List<Join> joins;
 
@@ -36,14 +38,10 @@ public class QueryContext<C extends Criteria> {
 
     // ========== CONSTRUCTOR ==========
 
-    public QueryContext() {
+    public QueryContext(C criteria) {
         this.joins = new ArrayList<>();
         this.params = new HashMap<>();
         this.conditions = new ArrayList<>();
-    }
-
-    public QueryContext(C criteria) {
-        this();
         this.criteria = criteria;
     }
 
@@ -195,7 +193,7 @@ public class QueryContext<C extends Criteria> {
             formatted = StringUtils.upperCase(formatted);
         }
         // escape underscore
-//        formatted = formatted.replace("_", "/_");
+        formatted = formatted.replace("_", "/_");
         formatted = "%" + formatted + "%";
         return formatted;
     }
@@ -217,27 +215,5 @@ public class QueryContext<C extends Criteria> {
     public QueryContext<C> addParameter(String alias, Object value, TemporalType type) {
         params.put(alias, new QueryParameter(alias, value, type));
         return this;
-    }
-
-    // ========== GETTERS & SETTERS =====
-
-    public C getCriteria() {
-        return criteria;
-    }
-
-    protected void setCriteria(C criteria) {
-        this.criteria = criteria;
-    }
-
-    protected List<String> getConditions() {
-        return conditions;
-    }
-
-    protected Map<String, QueryParameter> getParams() {
-        return params;
-    }
-
-    protected List<Join> getJoins() {
-        return joins;
     }
 }

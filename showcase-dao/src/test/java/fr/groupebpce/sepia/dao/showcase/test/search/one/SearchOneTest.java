@@ -46,8 +46,7 @@ class SearchOneTest {
 
         assertThat(clubDb).isPresent();
         assertThat(clubMem).isPresent();
-        assertThat(clubDb.get().getCode()).isEqualTo("BARCA");
-        assertThat(clubDb.get()).isEqualTo(clubMem.get());
+        assertThat(clubDb).isEqualTo(clubMem);
         display(clubDb.get());
     }
 

@@ -1,10 +1,8 @@
 package fr.groupebpce.sepia.dao.showcase.cache;
 
 import fr.groupebpce.sepia.dao.showcase.entity.Club;
-import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import lombok.Getter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
