@@ -1,0 +1,39 @@
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+
+spring:
+  sql:
+    init:
+      mode: always
+  datasource:
+    url: jdbc:h2:file:./src/test/resources/db/showcasedb
+  h2:
+    console:
+      enabled: true
+      settings:
+        trace: false
+  jpa:
+    defer-datasource-initialization: true
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      jakarta:
+        persistence:
+          sharedCache:
+            mode: ENABLE_SELECTIVE
+      hibernate:
+        cache:
+          user_second_level_cache: true
+          user_query_cache: true
+          region:
+            factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+        jakarta:
+          cache:
+            provider: org.ehcache.jsr107.EhcacheCachingProvider
+#            uri: cache/ehcache-jpa.xml
