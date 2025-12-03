@@ -30,7 +30,7 @@
         <dependency>
             <groupId>fr.groupebpce.sepia</groupId>
             <artifactId>sepia-dao-impl</artifactId>
-            <version>1.0</version>
+            <version>1.0.0</version>
         </dependency>
 
         <!-- ====================== CACHE ===================== -->
