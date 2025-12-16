@@ -17,7 +17,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>fr.groupebpce.sepia</groupId>
+            <groupId>fr.groupebpce.sepia.dao</groupId>
             <artifactId>sepia-dao-api</artifactId>
             <version>1.0.0</version>
         </dependency>
