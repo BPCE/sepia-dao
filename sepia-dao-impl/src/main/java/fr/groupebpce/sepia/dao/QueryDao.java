@@ -309,7 +309,7 @@ public abstract class QueryDao<E, C extends Criteria> {
     private String where(QueryContext<C> context) {
         StringJoiner jpql = new StringJoiner(" ")
                 .add("WHERE").add(getOperator().trueConditionTrick());
-        context.getConditions().forEach(condition -> jpql.add(getOperator().name()).add(condition));
+        context.getConditions().forEach(condition -> jpql.add(getOperator().name()).add("(").add(condition).add(")"));
         return jpql.toString();
     }
 
