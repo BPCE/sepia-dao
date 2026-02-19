@@ -23,5 +23,9 @@ public class PlayerDao extends QueryDao<Player, PlayerCriteria> {
             context.addParameter("club", criteria.getClub());
         }
         
+        if (nonNull(criteria.getName())) {
+            context.addStringCondition("player.name", "name", criteria.getName());
+        }
+        
     }
 }
