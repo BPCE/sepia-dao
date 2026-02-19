@@ -101,4 +101,4 @@ VALUES (NEXTVAL('PLAYER_SEQ'), 'Chevalier', 'FRA', 'PSG'),
        (NEXTVAL('PLAYER_SEQ'), 'Dembele', 'FRA', 'PSG'),
        (NEXTVAL('PLAYER_SEQ'), 'Doué', 'FRA', 'PSG'),
        (NEXTVAL('PLAYER_SEQ'), 'Barcola', 'FRA', 'PSG'),
-       (NEXTVAL('PLAYER_SEQ'), 'Kvaratskhelia', 'GEO', 'PSG');
+       (NEXTVAL('PLAYER_SEQ'), 'Kvarat_skhelia', 'GEO', 'PSG');

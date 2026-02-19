@@ -133,7 +133,7 @@ public class QueryContext<C extends Criteria> {
      */
     public QueryContext<C> addStringCondition(String path, String paramAlias, StringFilter stringFilter) {
         if (nonNull(stringFilter) && isNotEmpty(stringFilter.getValue())) {
-            addCondition("{path} {operator} :{paramAlias}"
+            addCondition("{path} {operator} :{paramAlias} escape '/' "
                     .replace("{path}", formatUpper(path, stringFilter.getIsIgnoreCase()))
                     .replace("{operator}", stringFilter.getOperator())
                     .replace("{paramAlias}", paramAlias)
@@ -172,7 +172,7 @@ public class QueryContext<C extends Criteria> {
      * @param paramValue : par of the parameter in the query (ex: "AreNa")
      */
     public QueryContext<C> addLikeCondition(String path, String paramAlias, String paramValue, boolean isIgnoreCase) {
-        addCondition(formatUpper(path, isIgnoreCase) + " like :" + paramAlias);
+        addCondition(formatUpper(path, isIgnoreCase) + " like :" + paramAlias + " escape '/' ");
         addParameter(paramAlias, formatLike(paramValue, isIgnoreCase));
         return this;
     }
