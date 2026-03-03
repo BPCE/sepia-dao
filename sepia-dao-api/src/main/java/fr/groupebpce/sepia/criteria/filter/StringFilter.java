@@ -74,6 +74,10 @@ public class StringFilter implements Serializable {
         return isTrue(getIsExact()) ? "=" : "like";
     }
     
+    public String getEscape() {
+        return isTrue(getIsExact()) ? "" : "escape '/'";
+    }
+    
     // ========== OBJECT ==========
 
     @Override

@@ -133,10 +133,11 @@ public class QueryContext<C extends Criteria> {
      */
     public QueryContext<C> addStringCondition(String path, String paramAlias, StringFilter stringFilter) {
         if (nonNull(stringFilter) && isNotEmpty(stringFilter.getValue())) {
-            addCondition("{path} {operator} :{paramAlias} escape '/' "
+            addCondition("{path} {operator} :{paramAlias} {escape}"
                     .replace("{path}", formatUpper(path, stringFilter.getIsIgnoreCase()))
                     .replace("{operator}", stringFilter.getOperator())
                     .replace("{paramAlias}", paramAlias)
+                    .replace("{escape}", stringFilter.getEscape())
             );
             if (isTrue(stringFilter.getIsExact())) {
                 addParameter(paramAlias, stringFilter.getValueConsideringCase());
