@@ -156,7 +156,7 @@ public class QueryContext<C extends Criteria> {
      *
      * @param path       : path of the entity to be tested (ex: "club.stadium.name")
      * @param paramAlias : alias of the parameter in the query (ex: "stadiumName")
-     * @param paramValue : par of the parameter in the query (ex: "AreNa")
+     * @param paramValue : part of the parameter in the query (ex: "AreNa")
      */
     public QueryContext<C> addLikeCondition(String path, String paramAlias, String paramValue) {
         addLikeCondition(path, paramAlias, paramValue, false);
@@ -170,7 +170,7 @@ public class QueryContext<C extends Criteria> {
      *
      * @param path       : path of the entity to be tested (ex: "club.stadium.name")
      * @param paramAlias : alias of the parameter in the query (ex: "stadiumName")
-     * @param paramValue : par of the parameter in the query (ex: "AreNa")
+     * @param paramValue : part of the parameter in the query (ex: "AreNa")
      */
     public QueryContext<C> addLikeCondition(String path, String paramAlias, String paramValue, boolean isIgnoreCase) {
         addCondition(formatUpper(path, isIgnoreCase) + " like :" + paramAlias + " escape '/' ");
